@@ -1,0 +1,83 @@
+import pulp
+
+prob = pulp.LpProblem("Minimize_Cost", pulp.LpMinimize)
+
+hours = {
+    'A': 200,
+    'B': 100,
+    'C': -15,
+    'D1': -6,
+    'D2': -12,
+    'D3': -15,
+    'D4': -40,
+    'D5': -12,
+    'D6': -20,
+    'D7': -25,
+    'D8': -6,
+    'E': -15,
+    'F': -10,
+    'G': -16,
+    'H': -12
+}
+
+costs = {
+    ('A', 'C'): 40,  
+    ('A', 'G'): 75,  
+    ('A', 'D1'): 50,  
+    ('B', 'E'): 40,  
+    ('C', 'E'): 40,  
+    ('D1', 'D2'): 50,  
+    ('D1', 'D3'): 75,  
+    ('D2', 'D4'): 75,  
+    ('D3', 'D4'): 75,  
+    ('D4', 'D5'): 75,  
+    ('D4', 'D6'): 70,  
+    ('D5', 'D8'): 40,  
+    ('D6', 'D7'): 70,  
+    ('D7', 'D8'): 40,  
+    ('D8', 'F'): 40,  
+    ('D8', 'G'): 75,  
+    ('E', 'F'): 40,  
+    ('F', 'H'): 40,  
+    ('G', 'H'): 40,  
+    ('A', 'Surplus'): 0,  
+    ('B', 'Surplus'): 0  
+}
+
+routes = pulp.LpVariable.dicts("Route", costs, lowBound=0, cat='Continuous')
+prob += pulp.lpSum([routes[i] * costs[i] for i in costs])
+for node in hours:
+    prob += (pulp.lpSum([routes[(i, j)] for (i, j) in costs if i == node]) - 
+             pulp.lpSum([routes[(i, j)] for (i, j) in costs if j == node]) == hours[node]), f"Node_{node}_balance"
+
+prob.solve()
+
+for v in prob.variables():
+    print(f"{v.name} = {v.varValue}")
+print(f"Total cost: {pulp.value(prob.objective)}")
+
+-------------------------------------------------------------------
+CODE OUTPUT
+
+Route_('A',_'C') = 15.0
+Route_('A',_'D1') = 136.0
+Route_('A',_'G') = 28.0
+Route_('A',_'Surplus') = 21.0
+Route_('B',_'E') = 25.0
+Route_('B',_'Surplus') = 75.0
+Route_('C',_'E') = 0.0
+Route_('D1',_'D2') = 115.0
+Route_('D1',_'D3') = 15.0
+Route_('D2',_'D4') = 103.0
+Route_('D3',_'D4') = 0.0
+Route_('D4',_'D5') = 18.0
+Route_('D4',_'D6') = 45.0
+Route_('D5',_'D8') = 6.0
+Route_('D6',_'D7') = 25.0
+Route_('D7',_'D8') = 0.0
+Route_('D8',_'F') = 0.0
+Route_('D8',_'G') = 0.0
+Route_('E',_'F') = 10.0
+Route_('F',_'H') = 0.0
+Route_('G',_'H') = 12.0
+Total cost: 32470.0

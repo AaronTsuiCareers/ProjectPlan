@@ -81,3 +81,170 @@ Route_('E',_'F') = 10.0
 Route_('F',_'H') = 0.0
 Route_('G',_'H') = 12.0
 Total cost: 32470.0
+
+
+-------------------------------------------------------------------
+CODE
+
+prob = pulp.LpProblem("Minimize_Cost", pulp.LpMinimize)
+
+hours = {
+    'A': 200,
+    'B': 100,
+    'C': -8,
+    'D1': -4,
+    'D2': -8,
+    'D3': -10,
+    'D4': -20,
+    'D5': -6,
+    'D6': -10,
+    'D7': -12,
+    'D8': -4,
+    'E': -10,
+    'F': -6,
+    'G': -8,
+    'H': -6
+}
+
+costs = {
+    ('A', 'C'): 40,  
+    ('A', 'G'): 75,  
+    ('A', 'D1'): 50,  
+    ('B', 'E'): 40,  
+    ('C', 'E'): 40,  
+    ('D1', 'D2'): 50,  
+    ('D1', 'D3'): 75,  
+    ('D2', 'D4'): 75,  
+    ('D3', 'D4'): 75,  
+    ('D4', 'D5'): 75,  
+    ('D4', 'D6'): 70,  
+    ('D5', 'D8'): 40,  
+    ('D6', 'D7'): 70,  
+    ('D7', 'D8'): 40,  
+    ('D8', 'F'): 40,  
+    ('D8', 'G'): 75,  
+    ('E', 'F'): 40,  
+    ('F', 'H'): 40,  
+    ('G', 'H'): 40,  
+    ('A', 'Surplus'): 0,  
+    ('B', 'Surplus'): 0  
+}
+
+routes = pulp.LpVariable.dicts("Route", costs, lowBound=0, cat='Continuous')
+prob += pulp.lpSum([routes[i] * costs[i] for i in costs])
+for node in hours:
+    prob += (pulp.lpSum([routes[(i, j)] for (i, j) in costs if i == node]) - 
+             pulp.lpSum([routes[(i, j)] for (i, j) in costs if j == node]) == hours[node]), f"Node_{node}_balance"
+
+prob.solve()
+
+for v in prob.variables():
+    print(f"{v.name} = {v.varValue}")
+print(f"Total cost: {pulp.value(prob.objective)}")
+-------------------------------------------------------------------
+CODE OUTPUT
+Route_('A',_'C') = 8.0
+Route_('A',_'D1') = 74.0
+Route_('A',_'G') = 14.0
+Route_('A',_'Surplus') = 104.0
+Route_('B',_'E') = 16.0
+Route_('B',_'Surplus') = 84.0
+Route_('C',_'E') = 0.0
+Route_('D1',_'D2') = 60.0
+Route_('D1',_'D3') = 10.0
+Route_('D2',_'D4') = 52.0
+Route_('D3',_'D4') = 0.0
+Route_('D4',_'D5') = 10.0
+Route_('D4',_'D6') = 22.0
+Route_('D5',_'D8') = 4.0
+Route_('D6',_'D7') = 12.0
+Route_('D7',_'D8') = 0.0
+Route_('D8',_'F') = 0.0
+Route_('D8',_'G') = 0.0
+Route_('E',_'F') = 6.0
+Route_('F',_'H') = 0.0
+Route_('G',_'H') = 6.0
+Total cost: 17130.0
+-------------------------------------------------------------------
+CODE
+
+prob = pulp.LpProblem("Minimize_Cost", pulp.LpMinimize)
+
+hours = {
+    'A': 300,
+    'B': 200,
+    'C': -24,
+    'D1': -10,
+    'D2': -18,
+    'D3': -24,
+    'D4': -60,
+    'D5': -18,
+    'D6': -30,
+    'D7': -40,
+    'D8': -10,
+    'E': -25,
+    'F': -15,
+    'G': -24,
+    'H': -20
+}
+
+
+costs = {
+    ('A', 'C'): 40,  
+    ('A', 'G'): 75,  
+    ('A', 'D1'): 50,  
+    ('B', 'E'): 40,  
+    ('C', 'E'): 40,  
+    ('D1', 'D2'): 50,  
+    ('D1', 'D3'): 75,  
+    ('D2', 'D4'): 75,  
+    ('D3', 'D4'): 75,  
+    ('D4', 'D5'): 75,  
+    ('D4', 'D6'): 70,  
+    ('D5', 'D8'): 40,  
+    ('D6', 'D7'): 70,  
+    ('D7', 'D8'): 40,  
+    ('D8', 'F'): 40,  
+    ('D8', 'G'): 75,  
+    ('E', 'F'): 40,  
+    ('F', 'H'): 40,  
+    ('G', 'H'): 40,  
+    ('A', 'Surplus'): 0,  
+    ('B', 'Surplus'): 0  
+}
+
+routes = pulp.LpVariable.dicts("Route", costs, lowBound=0, cat='Continuous')
+prob += pulp.lpSum([routes[i] * costs[i] for i in costs])
+for node in hours:
+    prob += (pulp.lpSum([routes[(i, j)] for (i, j) in costs if i == node]) - 
+             pulp.lpSum([routes[(i, j)] for (i, j) in costs if j == node]) == hours[node]), f"Node_{node}_balance"
+
+prob.solve()
+
+for v in prob.variables():
+    print(f"{v.name} = {v.varValue}")
+print(f"Total cost: {pulp.value(prob.objective)}")
+-------------------------------------------------------------------
+CODE OUTPUT
+Route_('A',_'C') = 24.0
+Route_('A',_'D1') = 210.0
+Route_('A',_'G') = 44.0
+Route_('A',_'Surplus') = 22.0
+Route_('B',_'E') = 40.0
+Route_('B',_'Surplus') = 160.0
+Route_('C',_'E') = 0.0
+Route_('D1',_'D2') = 176.0
+Route_('D1',_'D3') = 24.0
+Route_('D2',_'D4') = 158.0
+Route_('D3',_'D4') = 0.0
+Route_('D4',_'D5') = 28.0
+Route_('D4',_'D6') = 70.0
+Route_('D5',_'D8') = 10.0
+Route_('D6',_'D7') = 40.0
+Route_('D7',_'D8') = 0.0
+Route_('D8',_'F') = 0.0
+Route_('D8',_'G') = 0.0
+Route_('E',_'F') = 15.0
+Route_('F',_'H') = 0.0
+Route_('G',_'H') = 20.0
+Total cost: 50410.0
